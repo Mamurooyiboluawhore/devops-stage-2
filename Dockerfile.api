@@ -1,0 +1,27 @@
+# Use the official Python image from the Docker Hub
+FROM python:3.9
+
+# Install Poetry
+RUN apt-get update && apt-get install -y curl && \
+    curl -sSL https://install.python-poetry.org | python3 -
+
+# Update PATH for Poetry (this depends on the installation script)
+ENV PATH="/root/.local/bin:${PATH}"
+
+# Install FastAPI and Uvicorn
+RUN pip install fastapi uvicorn
+
+# Set the working directory
+WORKDIR /backend/app
+
+# Copy the current directory contents into the container
+COPY . /backend/app/
+
+# Install dependencies with Poetry
+RUN poetry install
+
+# Expose the port the app runs on
+EXPOSE 8000
+
+# Command to run the application
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
