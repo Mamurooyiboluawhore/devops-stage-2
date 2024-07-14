@@ -8,22 +8,36 @@ services:
       - '81:81'  # Port for Nginx Proxy Manager UI
       - '443:443'
     environment:
-      DB_MYSQL_HOST: "db"
-      DB_MYSQL_PORT: 3306
-      DB_MYSQL_USER: "npm"
-      DB_MYSQL_PASSWORD: "npm"
-      DB_MYSQL_NAME: "npm"
+      DB_SQLITE_FILE: "/data/database.sqlite"  # Using SQLite for Nginx Proxy Manager
     volumes:
       - ./data:/data
       - ./letsencrypt:/etc/letsencrypt
+    networks:
+      - web
+
+  adminer:
+    image: adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    networks:
+      - web
 
   db:
-    image: 'mysql:5.7'
+    image: postgres:13
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: 'npm'
-      MYSQL_DATABASE: 'npm'
-      MYSQL_USER: 'npm'
-      MYSQL_PASSWORD: 'npm'
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: npmjExaSJcGqiZTuYFaUAWqzrFprQFEVHnl
+      POSTGRES_DB: railway
     volumes:
-      - ./data/mysql:/var/lib/mysql
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - web
+
+networks:
+  web:
+    driver: bridge
+
+volumes:
+  postgres_data:
